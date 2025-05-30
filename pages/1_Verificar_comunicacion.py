@@ -1,4 +1,3 @@
-
 import streamlit as st
 import os
 import sys
@@ -33,6 +32,7 @@ def verificar_servicio(url, nombre_servicio):
     Returns:
         tuple: (bool, str) - (éxito, mensaje)
     """
+    logger.info(f"Iniciando verificación para el servicio: {nombre_servicio} en URL: {url}")
     # Plantilla de solicitud SOAP
     soap_request = """<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:siat="https://siat.impuestos.gob.bo/">
        <soapenv:Header/>
@@ -55,6 +55,7 @@ def verificar_servicio(url, nombre_servicio):
         
         # Enviar la solicitud SOAP
         response = requests.post(url, data=soap_request, headers=headers, timeout=10)
+        logger.debug(f"Respuesta recibida para {nombre_servicio}. Código de estado: {response.status_code}")
         
         # Verificar que la respuesta sea exitosa (código 200)
         response.raise_for_status()
@@ -71,29 +72,42 @@ def verificar_servicio(url, nombre_servicio):
             
             if transaccion_ok:
                 status_placeholder.success(f"✅ Servicio: {nombre_servicio} - OK ({response_time:.2f}s)")
+                logger.info(f"Servicio {nombre_servicio} OK. Transacción exitosa. Tiempo: {response_time:.2f}s")
                 return True, f"Comunicación exitosa en {response_time:.2f} segundos"
             else:
                 codigo = response_data.get('codigoEstado', 'Desconocido')
                 desc = response_data.get('codigoDescripcion', 'Sin descripción')
                 status_placeholder.warning(f"⚠️ Servicio: {nombre_servicio} - Respuesta: {codigo} ({response_time:.2f}s)")
+                logger.warning(f"Servicio {nombre_servicio} con respuesta no exitosa. Código: {codigo}, Descripción: {desc}. Tiempo: {response_time:.2f}s")
                 return False, f"Respuesta no exitosa: {codigo} - {desc}"
         else:
             error = response_data.get('error', 'Error desconocido')
             status_placeholder.error(f"❌ Servicio: {nombre_servicio} - Error: {error} ({response_time:.2f}s)")
+            logger.error(f"Error al procesar respuesta de {nombre_servicio}: {error}. Tiempo: {response_time:.2f}s")
             return False, f"Error en la comunicación: {error}"
             
     except requests.exceptions.Timeout:
         status_placeholder.error(f"⏱️ Servicio: {nombre_servicio} - TIMEOUT (>10s)")
+        logger.error(f"Timeout verificando servicio {nombre_servicio}.")
         return False, "Tiempo de espera agotado (>10s)"
-    except requests.exceptions.ConnectionError:
+    except requests.exceptions.ConnectionError as e:
         status_placeholder.error(f"🔌 Servicio: {nombre_servicio} - ERROR DE CONEXIÓN")
+        logger.error(f"Error de conexión verificando servicio {nombre_servicio}: {e}")
         return False, "Error de conexión al servidor"
     except requests.exceptions.RequestException as e:
         status_placeholder.error(f"❌ Servicio: {nombre_servicio} - ERROR: {str(e)}")
+        logger.error(f"Error de solicitud verificando servicio {nombre_servicio}: {e}")
         return False, f"Error en la solicitud: {str(e)}"
 
 def main():
     st.title("Verificador de Comunicación con SIAT")
+
+    # Verificar si la API_KEY está configurada
+    api_key = os.getenv("API_KEY")
+    if not api_key:
+        st.error("Error de Configuración: La variable de entorno API_KEY no está configurada. Por favor, verifíquela en su archivo .env.")
+        logger.error("API_KEY no está configurada en el archivo .env. La página de verificación no puede continuar.")
+        return # Detener la ejecución de esta página si no hay API_KEY
     
     # Extraer los endpoints y el API_KEY del .env
     endpoints = {
