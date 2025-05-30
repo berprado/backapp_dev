@@ -148,23 +148,34 @@ def main():
         # Crear un DataFrame para mostrar los resultados
         results = []
         
-        # Verificar cada servicio seleccionado
-        for servicio in servicios_a_verificar:
-            if servicio in endpoints and endpoints[servicio]:
-                exito, mensaje = verificar_servicio(endpoints[servicio], servicio)
-                
-                results.append({
-                    "Servicio": servicio,
-                    "Estado": "✅ Operativo" if exito else "❌ Con problemas",
-                    "Mensaje": mensaje
-                })
-            else:
-                results.append({
-                    "Servicio": servicio,
-                    "Estado": "⚠️ No configurado",
-                    "Mensaje": "URL no disponible en archivo .env"
-                })
-        
+        # Barra de progreso
+        if servicios_a_verificar:
+            progress_text = "Verificando servicios. Por favor espere."
+            my_bar = st.progress(0, text=progress_text)
+            total_servicios = len(servicios_a_verificar)
+
+            # Verificar cada servicio seleccionado
+            for i, servicio in enumerate(servicios_a_verificar):
+                if servicio in endpoints and endpoints[servicio]:
+                    exito, mensaje = verificar_servicio(endpoints[servicio], servicio)
+                    
+                    results.append({
+                        "Servicio": servicio,
+                        "Estado": "✅ Operativo" if exito else "❌ Con problemas",
+                        "Mensaje": mensaje
+                    })
+                else:
+                    results.append({
+                        "Servicio": servicio,
+                        "Estado": "⚠️ No configurado",
+                        "Mensaje": "URL no disponible en archivo .env"
+                    })
+                my_bar.progress((i + 1) / total_servicios, text=f"{progress_text} ({i+1}/{total_servicios})")
+            
+            my_bar.empty() # Limpiar la barra de progreso al finalizar
+        else:
+            st.warning("No se seleccionó ningún servicio para verificar o la lista está vacía.")
+
         # Mostrar resultados en una tabla
         if results:
             df = pd.DataFrame(results)
