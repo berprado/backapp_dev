@@ -185,10 +185,9 @@ def main():
             todos_operativos = all(row["Estado"] == "✅ Operativo" for row in results)
             
             if todos_operativos:
-                st.success("✅ Todos los servicios están operativos")
+                st.success("✅ Todos los servicios están operativos.")
             else:
-                servicios_con_problemas = [row["Servicio"] for row in results if row["Estado"] != "✅ Operativo"]
-                st.error(f"⚠️ Hay problemas con los siguientes servicios: {', '.join(servicios_con_problemas)}")
+                st.warning("⚠️ Algunos servicios presentan problemas o no están configurados. Por favor, revise la tabla para más detalles.")
                 
                 # Sugerir activar modo contingencia si hay problemas
                 st.warning("""
