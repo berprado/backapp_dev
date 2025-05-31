@@ -1,0 +1,21 @@
+# Dependencias principales
+streamlit
+
+# Para comunicación con servicios SOAP (SIAT)
+zeep
+
+# Para generación y manipulación de XML
+lxml
+
+# Para firma digital
+cryptography
+
+# Para manejo de variables de entorno (opcional, pero recomendado)
+python-dotenv
+
+# Para la base de datos (ejemplo con SQLAlchemy y SQLite)
+# sqlalchemy
+# alembic # Para migraciones de base de datos
+
+# Para pruebas (ejemplo)
+# pytest
