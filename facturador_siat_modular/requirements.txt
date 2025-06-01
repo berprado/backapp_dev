@@ -14,8 +14,10 @@ cryptography
 python-dotenv
 
 # Para la base de datos (ejemplo con SQLAlchemy y SQLite)
-# sqlalchemy
-# alembic # Para migraciones de base de datos
+sqlalchemy
+mysqlclient # Conector para MySQL
+alembic # Para migraciones de base de datos
+pydantic # Para validación de datos
 
 # Para pruebas (ejemplo)
 # pytest

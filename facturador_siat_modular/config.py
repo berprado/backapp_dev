@@ -15,7 +15,8 @@ class Config:
     SIAT_CODIGO_PUNTO_VENTA = os.getenv("SIAT_CODIGO_PUNTO_VENTA", "0")
 
     # Configuración de Base de Datos
-    DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./facturador_siat_modular.db")
+    # Asegúrate de que .env tenga la cadena de conexión correcta para MySQL
+    DATABASE_URL = os.getenv("DATABASE_URL", "mysql+mysqlclient://root@localhost:3306/facturador_siat_db_default")
 
     # Configuración de Logging
     LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO")

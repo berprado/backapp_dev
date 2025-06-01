@@ -1,4 +1,12 @@
 import streamlit as st
+from utils import setup_logging # Importamos la función
+
+# Llamamos a setup_logging() lo antes posible para configurar el logger
+# Es importante que esto se ejecute solo una vez.
+# Streamlit puede re-ejecutar el script en ciertas interacciones.
+# Una forma de asegurar que solo se ejecute una vez es verificar si ya se configuró,
+# o confiar en que la propia función setup_logging maneja múltiples llamadas (como lo hace la nuestra).
+setup_logging()
 
 def main():
     st.set_page_config(
